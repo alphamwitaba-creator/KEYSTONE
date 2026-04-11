@@ -443,6 +443,31 @@ function ViewportInstance({ realityId, realityLabel, realityColor, divergence, i
         state.particleSystem.updateAll(dt);
       }
 
+      // Update visual scripting for entities with scripts
+      if (isMain && state.isPlaying && !state.isPaused) {
+        state.entities.forEach(entity => {
+          if (entity.visualScript) {
+            state.executeVisualScript(entity.id, dt);
+          }
+          // Execute behavior trees
+          const executor = state.behaviorExecutors.get(entity.id);
+          if (executor && entity.behaviorTree) {
+            const result = executor.tick({
+              position: new THREE.Vector3(entity.transform.position.x, entity.transform.position.y, entity.transform.position.z),
+              dt,
+            });
+            if (result) {
+              // Apply movement if the behavior tree returns velocity
+              if (result.velocity) {
+                entity.transform.position.x += result.velocity.x * dt;
+                entity.transform.position.y += result.velocity.y * dt;
+                entity.transform.position.z += result.velocity.z * dt;
+              }
+            }
+          }
+        });
+      }
+
       // Scene settings: skybox, fog, ambient
       const ss = state.sceneSettings;
       updateSkybox(ss.skyboxPreset);

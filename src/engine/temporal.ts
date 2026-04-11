@@ -177,6 +177,72 @@ export interface FrameDiffEntry {
   changeMagnitude: number; // 0-1 normalized
 }
 
+/** Input event type */
+export type InputEventType = 'keydown' | 'keyup' | 'mousedown' | 'mouseup' | 'mousemove' | 'wheel' | 'gamepad' | 'touchstart' | 'touchend' | 'touchmove';
+
+/** Recorded input event */
+export interface InputEvent {
+  type: InputEventType;
+  frame: number;
+  timestamp: number;
+  key?: string;
+  code?: string;
+  mouseX?: number;
+  mouseY?: number;
+  mouseDeltaX?: number;
+  mouseDeltaY?: number;
+  button?: number;
+  wheelDelta?: number;
+  gamepadIndex?: number;
+  gamepadButtons?: number[];
+  gamepadAxes?: number[];
+  touchId?: number;
+}
+
+/** Game event type */
+export type GameEventType = 'spawn' | 'destroy' | 'collision' | 'trigger' | 'damage' | 'death' | 'powerup' | 'checkpoint' | 'custom';
+
+/** Game event for debugging */
+export interface GameEvent {
+  id: string;
+  type: GameEventType;
+  frame: number;
+  timestamp: number;
+  sourceEntityId: string;
+  sourceEntityName: string;
+  targetEntityId?: string;
+  targetEntityName?: string;
+  data: Record<string, number | string | boolean>;
+  chainId?: string;        // links to parent event for causal tracking
+  scriptLine?: number;     // source script line
+  scriptName?: string;     // source script file
+}
+
+/** Causal chain for debugging */
+export interface CausalChain {
+  id: string;
+  rootEventId: string;
+  events: GameEvent[];
+  leafEventId: string;
+  depth: number;
+}
+
+/** Seeded RNG state for deterministic replay */
+export interface SeededRNG {
+  seed: number;
+  state: number[];
+}
+
+/** Past state edit */
+export interface PastStateEdit {
+  frame: number;
+  entityId: string;
+  property: string;
+  oldValue: unknown;
+  newValue: unknown;
+  timestamp: number;
+}
+
 /** Configuration */
 export interface TemporalConfig {
   enabled: boolean;
@@ -193,6 +259,10 @@ export interface TemporalConfig {
   waveformResolution: number;    // waveform update interval
   captureScriptVars: boolean;
   capturePhysicsDetails: boolean;
+  captureInputs: boolean;       // record keyboard/mouse/controller
+  captureGameEvents: boolean;   // record spawns, deaths, triggers
+  enableCausalTracking: boolean; // track event chains
+  deterministicMode: boolean;   // use seeded RNG for replay
 }
 
 export const DEFAULT_TEMPORAL_CONFIG: TemporalConfig = {
@@ -210,6 +280,10 @@ export const DEFAULT_TEMPORAL_CONFIG: TemporalConfig = {
   waveformResolution: 3,
   captureScriptVars: true,
   capturePhysicsDetails: true,
+  captureInputs: true,        // record keyboard/mouse/controller
+  captureGameEvents: true,    // record spawns, deaths, triggers
+  enableCausalTracking: true, // track event chains
+  deterministicMode: false,   // disabled by default (enable for replay debugging)
 };
 
 // ============================================================
@@ -343,6 +417,21 @@ export class TemporalEngine {
   isScrubbing: boolean;
   bookmarks: { frame: number; label: string; branchId: string; color: string }[];
 
+  // Input + Event recording
+  inputEvents: InputEvent[];
+  gameEvents: GameEvent[];
+  causalChains: CausalChain[];
+  eventChainMap: Map<string, string>;  // eventId -> chainId
+
+  // Deterministic replay
+  seed: number;
+  rngState: number[];
+  originalSeed: number;
+
+  // Past state editing
+  pendingEdits: PastStateEdit[];
+  editHistory: PastStateEdit[];
+
   // Subsystems
   private compressor: DeltaCompressor;
   private reconstructionCache: Map<number, EntityState[]>;
@@ -368,6 +457,21 @@ export class TemporalEngine {
     this.isRecording = false;
     this.isScrubbing = false;
     this.bookmarks = [];
+
+    // Input + Event recording
+    this.inputEvents = [];
+    this.gameEvents = [];
+    this.causalChains = [];
+    this.eventChainMap = new Map();
+
+    // Deterministic replay
+    this.seed = Date.now();
+    this.rngState = [];
+    this.originalSeed = this.seed;
+
+    // Past state editing
+    this.pendingEdits = [];
+    this.editHistory = [];
 
     this.compressor = new DeltaCompressor();
     this.reconstructionCache = new Map();
@@ -1069,6 +1173,11 @@ export class TemporalEngine {
     compressionRatio: number;
     keyframeCount: number;
     deltaCount: number;
+    inputEventCount: number;
+    gameEventCount: number;
+    causalChainCount: number;
+    deterministicMode: boolean;
+    originalSeed: number;
   } {
     const branch = this.getActiveBranch();
     const meta = branch?.frames.length ? branch.frames[branch.frames.length - 1].meta : null;
@@ -1095,6 +1204,11 @@ export class TemporalEngine {
       compressionRatio: this.compressionRatio,
       keyframeCount: this.keyframeCount,
       deltaCount: this.deltaCount,
+      inputEventCount: this.inputEvents.length,
+      gameEventCount: this.gameEvents.length,
+      causalChainCount: this.causalChains.length,
+      deterministicMode: this.config.deterministicMode,
+      originalSeed: this.originalSeed,
     };
   }
 
@@ -1135,5 +1249,319 @@ export class TemporalEngine {
     this.comparisonFrameB = null;
     this.reconstructionCache.clear();
     this.waveformCache = [];
+
+    // Reset new systems
+    this.inputEvents = [];
+    this.gameEvents = [];
+    this.causalChains = [];
+    this.eventChainMap.clear();
+    this.seed = Date.now();
+    this.originalSeed = this.seed;
+    this.rngState = [];
+    this.pendingEdits = [];
+    this.editHistory = [];
+  }
+
+  // ============================================================
+  // INPUT EVENT RECORDING
+  // ============================================================
+
+  recordInputEvent(event: Omit<InputEvent, 'frame' | 'timestamp'>): void {
+    if (!this.config.enabled || !this.config.captureInputs || !this.isRecording) return;
+    
+    this.inputEvents.push({
+      ...event,
+      frame: this.currentFrame,
+      timestamp: Date.now(),
+    });
+
+    // Limit input storage
+    if (this.inputEvents.length > 10000) {
+      this.inputEvents = this.inputEvents.slice(-5000);
+    }
+  }
+
+  getInputsAtFrame(frame: number): InputEvent[] {
+    return this.inputEvents.filter(e => e.frame === frame);
+  }
+
+  getInputsInRange(startFrame: number, endFrame: number): InputEvent[] {
+    return this.inputEvents.filter(e => e.frame >= startFrame && e.frame <= endFrame);
+  }
+
+  clearInputs(): void {
+    this.inputEvents = [];
+  }
+
+  // ============================================================
+  // GAME EVENT LOGGING
+  // ============================================================
+
+  logGameEvent(event: Omit<GameEvent, 'id' | 'frame' | 'timestamp'>): void {
+    if (!this.config.enabled || !this.config.captureGameEvents || !this.isRecording) return;
+
+    const gameEvent: GameEvent = {
+      ...event,
+      id: `evt_${this.gameEvents.length}_${Date.now()}`,
+      frame: this.currentFrame,
+      timestamp: Date.now(),
+    };
+
+    this.gameEvents.push(gameEvent);
+
+    // Link to parent event for causal tracking
+    if (event.chainId && this.config.enableCausalTracking) {
+      this.eventChainMap.set(gameEvent.id, event.chainId);
+    }
+
+    // Limit event storage
+    if (this.gameEvents.length > 5000) {
+      this.gameEvents = this.gameEvents.slice(-2500);
+    }
+  }
+
+  getEventsAtFrame(frame: number): GameEvent[] {
+    return this.gameEvents.filter(e => e.frame === frame);
+  }
+
+  getEventsInRange(startFrame: number, endFrame: number): GameEvent[] {
+    return this.gameEvents.filter(e => e.frame >= startFrame && e.frame <= endFrame);
+  }
+
+  getEventsByType(type: GameEventType): GameEvent[] {
+    return this.gameEvents.filter(e => e.type === type);
+  }
+
+  clearGameEvents(): void {
+    this.gameEvents = [];
+    this.causalChains = [];
+    this.eventChainMap.clear();
+  }
+
+  // ============================================================
+  // CAUSAL TRACKING
+  // ============================================================
+
+  buildCausalChains(): void {
+    if (!this.config.enableCausalTracking) return;
+
+    this.causalChains = [];
+    const chainMap = new Map<string, GameEvent[]>();
+
+    // Group events by chain
+    for (const event of this.gameEvents) {
+      if (event.chainId) {
+        const chain = chainMap.get(event.chainId) || [];
+        chain.push(event);
+        chainMap.set(event.chainId, chain);
+      }
+    }
+
+    // Build causal chains
+    for (const [chainId, events] of chainMap) {
+      const sorted = events.sort((a, b) => a.frame - b.frame);
+      this.causalChains.push({
+        id: chainId,
+        rootEventId: sorted[0]?.id || '',
+        events: sorted,
+        leafEventId: sorted[sorted.length - 1]?.id || '',
+        depth: sorted.length,
+      });
+    }
+  }
+
+  getCausalChainForEvent(eventId: string): CausalChain | null {
+    const chainId = this.eventChainMap.get(eventId);
+    if (!chainId) return null;
+    return this.causalChains.find(c => c.id === chainId) || null;
+  }
+
+  getEventChain(frame: number): GameEvent[] {
+    return this.gameEvents
+      .filter(e => e.frame <= frame)
+      .sort((a, b) => a.frame - b.frame);
+  }
+
+  traceCausality(targetFrame: number, targetEntityId: string): {
+    events: GameEvent[];
+    summary: string;
+  } {
+    const relevantEvents = this.gameEvents
+      .filter(e => e.frame <= targetFrame && 
+        (e.sourceEntityId === targetEntityId || e.targetEntityId === targetEntityId))
+      .sort((a, b) => b.frame - a.frame);
+
+    const summary = relevantEvents.length > 0
+      ? `Found ${relevantEvents.length} events leading to frame ${targetFrame}`
+      : `No causal events found for entity ${targetEntityId} up to frame ${targetFrame}`;
+
+    return { events: relevantEvents, summary };
+  }
+
+  // ============================================================
+  // DETERMINISTIC REPLAY
+  // ============================================================
+
+  setSeed(seed: number): void {
+    this.seed = seed;
+    this.originalSeed = seed;
+    // Initialize LCG state
+    this.rngState = [seed];
+  }
+
+  private _nextRandom(): number {
+    // Linear Congruential Generator for deterministic replay
+    const a = 1664525;
+    const c = 1013904223;
+    const m = 0xFFFFFFFF;
+    
+    this.seed = (a * this.seed + c) % m;
+    this.rngState.push(this.seed);
+    return this.seed / m;
+  }
+
+  getDeterministicRandom(): number {
+    if (!this.config.deterministicMode) {
+      return Math.random();
+    }
+    return this._nextRandom();
+  }
+
+  getDeterministicRandomRange(min: number, max: number): number {
+    return min + this.getDeterministicRandom() * (max - min);
+  }
+
+  resetToOriginalSeed(): void {
+    this.seed = this.originalSeed;
+  }
+
+  getReplayData(): { seed: number; inputCount: number; eventCount: number } {
+    return {
+      seed: this.originalSeed,
+      inputCount: this.inputEvents.length,
+      eventCount: this.gameEvents.length,
+    };
+  }
+
+  // ============================================================
+  // PAST STATE EDITING
+  // ============================================================
+
+  editPastState(
+    frame: number,
+    entityId: string,
+    property: string,
+    newValue: unknown
+  ): boolean {
+    const states = this.reconstructFrame(frame);
+    if (!states) return false;
+
+    const entityState = states.find(e => e.id === entityId);
+    if (!entityState) return false;
+
+    const oldValue = (entityState as Record<string, unknown>)[property];
+
+    const edit: PastStateEdit = {
+      frame,
+      entityId,
+      property,
+      oldValue,
+      newValue,
+      timestamp: Date.now(),
+    };
+
+    this.pendingEdits.push(edit);
+    this.editHistory.push(edit);
+
+    // Apply the edit directly to the cached frame
+    (entityState as Record<string, unknown>)[property] = newValue;
+
+    return true;
+  }
+
+  getPendingEdits(): PastStateEdit[] {
+    return this.pendingEdits;
+  }
+
+  getEditHistory(): PastStateEdit[] {
+    return this.editHistory;
+  }
+
+  commitEdits(): void {
+    // Edits are already applied to cached frames
+    // This just clears the pending queue
+    this.pendingEdits = [];
+  }
+
+  revertEdits(): void {
+    // Revert pending edits
+    for (const edit of this.pendingEdits) {
+      const states = this.reconstructFrame(edit.frame);
+      if (!states) continue;
+      
+      const entityState = states.find(e => e.id === edit.entityId);
+      if (entityState) {
+        (entityState as Record<string, unknown>)[edit.property] = edit.oldValue;
+      }
+    }
+
+    // Clear pending edits but keep history for reference
+    this.pendingEdits = [];
+  }
+
+  undoLastEdit(): boolean {
+    const lastEdit = this.editHistory.pop();
+    if (!lastEdit) return false;
+
+    // Remove from pending if present
+    this.pendingEdits = this.pendingEdits.filter(e => 
+      !(e.frame === lastEdit.frame && e.entityId === lastEdit.entityId && e.property === lastEdit.property)
+    );
+
+    // Revert the change
+    const states = this.reconstructFrame(lastEdit.frame);
+    if (!states) return false;
+
+    const entityState = states.find(e => e.id === lastEdit.entityId);
+    if (entityState) {
+      (entityState as Record<string, unknown>)[lastEdit.property] = lastEdit.oldValue;
+    }
+
+    return true;
+  }
+
+  // ============================================================
+  // DEBUG CAUSAL REPORTING
+  // ============================================================
+
+  generateBugReport(targetFrame: number, targetEntityId?: string): {
+    frame: number;
+    entityId?: string;
+    eventChain: GameEvent[];
+    causalChains: CausalChain[];
+    summary: string;
+  } {
+    const events = this.getEventsInRange(0, targetFrame);
+    const entities = targetEntityId 
+      ? events.filter(e => e.sourceEntityId === targetEntityId || e.targetEntityId === targetEntityId)
+      : events;
+
+    this.buildCausalChains();
+
+    // Find chains that end at or near target frame
+    const relevantChains = this.causalChains.filter(c => {
+      const lastEvent = c.events[c.events.length - 1];
+      return lastEvent && lastEvent.frame >= targetFrame - 100;
+    });
+
+    const summary = `Bug at frame ${targetFrame}: ${entities.length} events, ${relevantChains.length} causal chains`;
+
+    return {
+      frame: targetFrame,
+      entityId: targetEntityId,
+      eventChain: entities,
+      causalChains: relevantChains,
+      summary,
+    };
   }
 }
