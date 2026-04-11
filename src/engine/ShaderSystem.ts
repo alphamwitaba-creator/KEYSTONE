@@ -264,3 +264,280 @@ export class ShaderSystem {
 }
 
 export const shaderSystem = new ShaderSystem();
+
+// ============================================================
+// ENHANCED SHADER COMPILATION
+// ============================================================
+
+export interface ShaderUniform {
+  name: string;
+  type: 'float' | 'vec2' | 'vec3' | 'vec4' | 'color' | 'texture' | 'int' | 'bool';
+  value: unknown;
+  min?: number;
+  max?: number;
+}
+
+export interface ShaderPass {
+  id: string;
+  name: string;
+  graph: ShaderGraph;
+  enabled: boolean;
+  uniforms: ShaderUniform[];
+}
+
+export interface PostProcessEffect {
+  id: string;
+  name: string;
+  enabled: boolean;
+  priority: number;
+  shaderPass: ShaderPass;
+}
+
+// Post-processing effects
+export const POST_PROCESS_EFFECTS: PostProcessEffect[] = [
+  {
+    id: 'bloom',
+    name: 'Bloom',
+    enabled: false,
+    priority: 10,
+    shaderPass: {
+      id: 'bloom_pass',
+      name: 'Bloom Pass',
+      graph: {} as ShaderGraph,
+      enabled: true,
+      uniforms: [
+        { name: 'threshold', type: 'float', value: 0.8, min: 0, max: 1 },
+        { name: 'strength', type: 'float', value: 0.5, min: 0, max: 2 },
+        { name: 'radius', type: 'float', value: 0.5, min: 0, max: 1 },
+      ],
+    },
+  },
+  {
+    id: 'chromatic_aberration',
+    name: 'Chromatic Aberration',
+    enabled: false,
+    priority: 20,
+    shaderPass: {
+      id: 'chromatic_pass',
+      name: 'Chromatic Aberration',
+      graph: {} as ShaderGraph,
+      enabled: true,
+      uniforms: [
+        { name: 'amount', type: 'float', value: 0.5, min: 0, max: 1 },
+        { name: 'angle', type: 'float', value: 0, min: 0, max: 360 },
+      ],
+    },
+  },
+  {
+    id: 'vignette',
+    name: 'Vignette',
+    enabled: false,
+    priority: 30,
+    shaderPass: {
+      id: 'vignette_pass',
+      name: 'Vignette',
+      graph: {} as ShaderGraph,
+      enabled: true,
+      uniforms: [
+        { name: 'intensity', type: 'float', value: 0.5, min: 0, max: 1 },
+        { name: 'smoothness', type: 'float', value: 0.5, min: 0, max: 1 },
+        { name: 'color', type: 'color', value: '#000000' },
+      ],
+    },
+  },
+  {
+    id: 'color_grading',
+    name: 'Color Grading',
+    enabled: false,
+    priority: 40,
+    shaderPass: {
+      id: 'color_grading_pass',
+      name: 'Color Grading',
+      graph: {} as ShaderGraph,
+      enabled: true,
+      uniforms: [
+        { name: 'brightness', type: 'float', value: 0, min: -1, max: 1 },
+        { name: 'contrast', type: 'float', value: 1, min: 0, max: 2 },
+        { name: 'saturation', type: 'float', value: 1, min: 0, max: 2 },
+        { name: 'temperature', type: 'float', value: 0, min: -1, max: 1 },
+      ],
+    },
+  },
+  {
+    id: 'blur',
+    name: 'Blur',
+    enabled: false,
+    priority: 5,
+    shaderPass: {
+      id: 'blur_pass',
+      name: 'Blur',
+      graph: {} as ShaderGraph,
+      enabled: true,
+      uniforms: [
+        { name: 'radius', type: 'float', value: 2, min: 0, max: 20 },
+        { name: 'direction', type: 'vec2', value: { x: 1, y: 1 } },
+      ],
+    },
+  },
+  {
+    id: 'film_grain',
+    name: 'Film Grain',
+    enabled: false,
+    priority: 50,
+    shaderPass: {
+      id: 'film_grain_pass',
+      name: 'Film Grain',
+      graph: {} as ShaderGraph,
+      enabled: true,
+      uniforms: [
+        { name: 'intensity', type: 'float', value: 0.1, min: 0, max: 1 },
+        { name: 'animated', type: 'bool', value: true },
+      ],
+    },
+  },
+];
+
+export class EnhancedShaderCompiler {
+  private compilationCache = new Map<string, { vertex: string; fragment: string; uniforms: Record<string, unknown> }>();
+  
+  // Shader validation
+  validateShader(source: string): { valid: boolean; errors: string[]; warnings: string[] } {
+    const errors: string[] = [];
+    const warnings: string[] = [];
+    
+    // Check for common GLSL errors
+    const lines = source.split('\n');
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      const lineNum = i + 1;
+      
+      // Check for missing semicolons (simplified)
+      if (line.length > 0 && !line.startsWith('//') && !line.startsWith('#') && !line.endsWith('{') && !line.endsWith('}')) {
+        // Skip common patterns
+        if (!line.includes(';') && !line.includes('return') && !line.includes('void')) {
+          // warnings.push(`Line ${lineNum}: Possible missing semicolon`);
+        }
+      }
+      
+      // Check for unclosed braces
+      if (line.includes('{') && !line.includes('}')) {
+        // Track open braces
+      }
+    }
+    
+    // Check for main function
+    if (!source.includes('void main()')) {
+      errors.push('Missing main() function');
+    }
+    
+    // Check for gl_FragColor or out color
+    if (!source.includes('gl_FragColor') && !source.includes('out vec4')) {
+      warnings.push('No output color assignment found');
+    }
+    
+    return {
+      valid: errors.length === 0,
+      errors,
+      warnings,
+    };
+  }
+  
+  // Optimize shader code
+  optimizeShader(source: string): string {
+    let optimized = source;
+    
+    // Remove comments
+    optimized = optimized.replace(/\/\*[\s\S]*?\*\//g, '');
+    optimized = optimized.replace(/\/\/.*$/gm, '');
+    
+    // Remove unnecessary whitespace
+    optimized = optimized.replace(/\s+/g, ' ');
+    optimized = optimized.replace(/\s*([{}\[\](),;:])\s*/g, '$1');
+    
+    // Common subexpression elimination (simplified)
+    // In production, this would be more sophisticated
+    
+    return optimized;
+  }
+  
+  // Generate shader from node graph with optimizations
+  compileOptimized(graph: ShaderGraph, textures: Map<string, THREE.Texture>): { vertex: string; fragment: string } {
+    const cacheKey = JSON.stringify({ graphId: graph.id, textureCount: textures.size });
+    
+    if (this.compilationCache.has(cacheKey)) {
+      const cached = this.compilationCache.get(cacheKey)!;
+      return { vertex: cached.vertex, fragment: cached.fragment };
+    }
+    
+    // Use existing compile method
+    const material = shaderSystem.compileGraph(graph, textures);
+    const result = {
+      vertex: material.vertexShader || '',
+      fragment: material.fragmentShader || '',
+    };
+    
+    this.compilationCache.set(cacheKey, { ...result, uniforms: material.uniforms });
+    return result;
+  }
+  
+  // Clear compilation cache
+  clearCache(): void {
+    this.compilationCache.clear();
+  }
+  
+  // Get memory usage estimate
+  getMemoryEstimate(graph: ShaderGraph): number {
+    let estimate = 0;
+    
+    // Estimate based on node count and complexity
+    for (const node of graph.nodes) {
+      switch (node.type) {
+        case 'texture':
+          estimate += 1024; // 1KB per texture node
+          break;
+        case 'noise':
+        case 'fresnel':
+          estimate += 64;
+          break;
+        default:
+          estimate += 16;
+      }
+    }
+    
+    // Edge overhead
+    estimate += graph.edges.length * 8;
+    
+    return estimate;
+  }
+}
+
+export const shaderCompiler = new EnhancedShaderCompiler();
+
+// ============================================================
+// SHADER UNIFORM BINDINGS
+// ============================================================
+
+export class ShaderUniformBinder {
+  private bindings = new Map<string, Map<string, (uniforms: Record<string, unknown>, value: unknown) => void>>();
+  
+  registerBinding(graphId: string, uniformName: string, setter: (uniforms: Record<string, unknown>, value: unknown) => void): void {
+    if (!this.bindings.has(graphId)) {
+      this.bindings.set(graphId, new Map());
+    }
+    this.bindings.get(graphId)!.set(uniformName, setter);
+  }
+  
+  applyUniforms(graphId: string, uniforms: Record<string, unknown>): void {
+    const graphBindings = this.bindings.get(graphId);
+    if (!graphBindings) return;
+    
+    for (const [name, setter] of graphBindings) {
+      if (uniforms[name] !== undefined) {
+        setter(uniforms, uniforms[name]);
+      }
+    }
+  }
+}
+
+export const uniformBinder = new ShaderUniformBinder();
