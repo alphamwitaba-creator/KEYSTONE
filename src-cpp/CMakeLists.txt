@@ -116,14 +116,17 @@ set(EDITOR_HEADERS
     include/kevla/editor/HierarchyPanel.h
     include/kevla/editor/InspectorPanel.h
     include/kevla/editor/ToolbarPanel.h
+    include/kevla/editor/Gizmo.h
+    include/kevla/editor/UndoRedo.h
+    include/kevla/editor/Hotkeys.h
 )
 
 set(EDITOR_SOURCES
     src/editor/Editor.cpp
-    src/editor/SceneView.cpp
-    src/editor/HierarchyPanel.cpp
-    src/editor/InspectorPanel.cpp
-    src/editor/ToolbarPanel.cpp
+    src/editor/EditorPanels.cpp
+    src/editor/Gizmo.cpp
+    src/editor/UndoRedo.cpp
+    src/editor/Hotkeys.cpp
 )
 
 # Create engine library
