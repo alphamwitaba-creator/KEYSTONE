@@ -65,6 +65,10 @@ set(ENGINE_HEADERS
     include/kevla/Entity.h
     include/kevla/Scene.h
     include/kevla/Logger.h
+    include/kevla/render/Renderer.h
+    include/kevla/render/Terrain.h
+    include/kevla/ai/BehaviorTree.h
+    include/kevla/vfx/VFXGraph.h
 )
 
 set(ENGINE_SOURCES
