@@ -74,6 +74,8 @@ set(ENGINE_SOURCES
     src/core/Core.cpp
     src/core/Logger.cpp
     src/core/Types.cpp
+    src/core/Entity.cpp
+    src/core/Scene.cpp
 )
 
 set(RENDERER_HEADERS
@@ -92,6 +94,7 @@ set(RENDERER_SOURCES
     src/render/Shader.cpp
     src/render/Framebuffer.cpp
     src/render/Light.cpp
+    src/render/Terrain.cpp
 )
 
 # Physics subsystem
@@ -107,6 +110,16 @@ set(PHYSICS_SOURCES
     src/physics/RigidBody.cpp
     src/physics/Collider.cpp
     src/physics/Joint.cpp
+)
+
+# AI subsystem
+set(AI_SOURCES
+    src/ai/BehaviorTree.cpp
+)
+
+# VFX subsystem
+set(VFX_SOURCES
+    src/vfx/VFXGraph.cpp
 )
 
 set(EDITOR_HEADERS
@@ -133,6 +146,8 @@ add_library(kevla_core STATIC
     ${RENDERER_SOURCES}
     ${PHYSICS_HEADERS}
     ${PHYSICS_SOURCES}
+    ${AI_SOURCES}
+    ${VFX_SOURCES}
 )
 
 target_include_directories(kevla_core PUBLIC
