@@ -94,11 +94,19 @@ set(RENDERER_SOURCES
     src/render/Light.cpp
 )
 
-# Physics subsystem (placeholder - implementation pending)
+# Physics subsystem
 set(PHYSICS_HEADERS
+    include/kevla/physics/PhysicsWorld.h
+    include/kevla/physics/RigidBody.h
+    include/kevla/physics/Collider.h
+    include/kevla/physics/Joint.h
 )
 
 set(PHYSICS_SOURCES
+    src/physics/PhysicsWorld.cpp
+    src/physics/RigidBody.cpp
+    src/physics/Collider.cpp
+    src/physics/Joint.cpp
 )
 
 set(EDITOR_HEADERS
