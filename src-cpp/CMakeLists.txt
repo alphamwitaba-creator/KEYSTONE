@@ -61,7 +61,6 @@ set(ENGINE_HEADERS
     include/kevla/Types.h
     include/kevla/Vector.h
     include/kevla/Matrix.h
-    include/kevla/Transform.h
     include/kevla/Entity.h
     include/kevla/Scene.h
     include/kevla/Logger.h
@@ -79,7 +78,6 @@ set(ENGINE_SOURCES
 
 set(RENDERER_HEADERS
     include/kevla/render/Renderer.h
-    include/kevla/render/Camera.h
     include/kevla/render/Mesh.h
     include/kevla/render/Material.h
     include/kevla/render/Shader.h
@@ -89,33 +87,23 @@ set(RENDERER_HEADERS
 
 set(RENDERER_SOURCES
     src/render/Renderer.cpp
-    src/render/Camera.cpp
     src/render/Mesh.cpp
     src/render/Material.cpp
     src/render/Shader.cpp
+    src/render/Framebuffer.cpp
+    src/render/Light.cpp
 )
 
+# Physics subsystem (placeholder - implementation pending)
 set(PHYSICS_HEADERS
-    include/kevla/physics/PhysicsWorld.h
-    include/kevla/physics/RigidBody.h
-    include/kevla/physics/Collider.h
-    include/kevla/physics/Joint.h
 )
 
 set(PHYSICS_SOURCES
-    src/physics/PhysicsWorld.cpp
-    src/physics/RigidBody.cpp
-    src/physics/Collider.cpp
-    src/physics/Joint.cpp
 )
 
 set(EDITOR_HEADERS
     include/kevla/editor/Editor.h
-    include/kevla/editor/EditorCamera.h
-    include/kevla/editor/SceneView.h
-    include/kevla/editor/HierarchyPanel.h
-    include/kevla/editor/InspectorPanel.h
-    include/kevla/editor/ToolbarPanel.h
+    include/kevla/editor/EditorPanels.h
     include/kevla/editor/Gizmo.h
     include/kevla/editor/UndoRedo.h
     include/kevla/editor/Hotkeys.h
