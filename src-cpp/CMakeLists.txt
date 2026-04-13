@@ -156,6 +156,7 @@ set(EDITOR_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/editor/UndoRedo.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/editor/Hotkeys.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/editor/SculptPanel.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/editor/UVEditor.h
 )
 
 set(EDITOR_SOURCES
@@ -165,6 +166,7 @@ set(EDITOR_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/editor/UndoRedo.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/editor/Hotkeys.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/editor/SculptPanel.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/editor/UVEditor.cpp
 )
 
 # Create engine library
