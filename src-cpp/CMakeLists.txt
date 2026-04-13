@@ -122,12 +122,22 @@ set(VFX_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/vfx/VFXGraph.cpp
 )
 
+# Sculpt subsystem
+set(SCULPT_HEADERS
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/sculpt/Sculpt.h
+)
+
+set(SCULPT_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/sculpt/Sculpt.cpp
+)
+
 set(EDITOR_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/editor/Editor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/editor/EditorPanels.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/editor/Gizmo.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/editor/UndoRedo.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/editor/Hotkeys.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/editor/SculptPanel.h
 )
 
 set(EDITOR_SOURCES
@@ -136,6 +146,7 @@ set(EDITOR_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/editor/Gizmo.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/editor/UndoRedo.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/editor/Hotkeys.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/editor/SculptPanel.cpp
 )
 
 # Create engine library
@@ -148,6 +159,8 @@ add_library(kevla_core STATIC
     ${PHYSICS_SOURCES}
     ${AI_SOURCES}
     ${VFX_SOURCES}
+    ${SCULPT_HEADERS}
+    ${SCULPT_SOURCES}
 )
 
 target_include_directories(kevla_core PUBLIC
