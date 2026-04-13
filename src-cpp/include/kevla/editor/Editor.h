@@ -7,6 +7,10 @@
 namespace kevla {
 
 class Entity;
+class SceneView;
+class HierarchyPanel;
+class InspectorPanel;
+class ToolbarPanel;
 
 // ============================================================
 // Editor - Main Editor Application
