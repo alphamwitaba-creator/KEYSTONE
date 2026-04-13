@@ -149,6 +149,15 @@ set(ANIMATION_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/animation/Animation.cpp
 )
 
+# Serialization subsystem
+set(SERIALIZATION_HEADERS
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/serialization/SceneSerialization.h
+)
+
+set(SERIALIZATION_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/serialization/SceneSerialization.cpp
+)
+
 set(EDITOR_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/editor/Editor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/editor/EditorPanels.h
@@ -187,6 +196,8 @@ add_library(kevla_core STATIC
     ${ASSETS_SOURCES}
     ${ANIMATION_HEADERS}
     ${ANIMATION_SOURCES}
+    ${SERIALIZATION_HEADERS}
+    ${SERIALIZATION_SOURCES}
 )
 
 target_include_directories(kevla_core PUBLIC
