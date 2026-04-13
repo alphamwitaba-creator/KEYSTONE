@@ -131,6 +131,24 @@ set(SCULPT_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/sculpt/Sculpt.cpp
 )
 
+# Assets subsystem
+set(ASSETS_HEADERS
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/assets/AssetManager.h
+)
+
+set(ASSETS_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/assets/AssetManager.cpp
+)
+
+# Animation subsystem
+set(ANIMATION_HEADERS
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/animation/Animation.h
+)
+
+set(ANIMATION_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/animation/Animation.cpp
+)
+
 set(EDITOR_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/editor/Editor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/editor/EditorPanels.h
@@ -161,6 +179,10 @@ add_library(kevla_core STATIC
     ${VFX_SOURCES}
     ${SCULPT_HEADERS}
     ${SCULPT_SOURCES}
+    ${ASSETS_HEADERS}
+    ${ASSETS_SOURCES}
+    ${ANIMATION_HEADERS}
+    ${ANIMATION_SOURCES}
 )
 
 target_include_directories(kevla_core PUBLIC
