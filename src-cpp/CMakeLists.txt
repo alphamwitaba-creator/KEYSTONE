@@ -57,85 +57,85 @@ FetchContent_MakeAvailable(spdlog)
 
 # Source files
 set(ENGINE_HEADERS
-    include/kevla/Core.h
-    include/kevla/Types.h
-    include/kevla/Vector.h
-    include/kevla/Matrix.h
-    include/kevla/Entity.h
-    include/kevla/Scene.h
-    include/kevla/Logger.h
-    include/kevla/render/Renderer.h
-    include/kevla/render/Terrain.h
-    include/kevla/ai/BehaviorTree.h
-    include/kevla/vfx/VFXGraph.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/Core.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/Types.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/Vector.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/Matrix.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/Entity.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/Scene.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/Logger.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/render/Renderer.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/render/Terrain.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/ai/BehaviorTree.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/vfx/VFXGraph.h
 )
 
 set(ENGINE_SOURCES
-    src/core/Core.cpp
-    src/core/Logger.cpp
-    src/core/Types.cpp
-    src/core/Entity.cpp
-    src/core/Scene.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/Core.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/Logger.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/Types.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/Entity.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/Scene.cpp
 )
 
 set(RENDERER_HEADERS
-    include/kevla/render/Renderer.h
-    include/kevla/render/Mesh.h
-    include/kevla/render/Material.h
-    include/kevla/render/Shader.h
-    include/kevla/render/Framebuffer.h
-    include/kevla/render/Light.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/render/Renderer.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/render/Mesh.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/render/Material.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/render/Shader.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/render/Framebuffer.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/render/Light.h
 )
 
 set(RENDERER_SOURCES
-    src/render/Renderer.cpp
-    src/render/Mesh.cpp
-    src/render/Material.cpp
-    src/render/Shader.cpp
-    src/render/Framebuffer.cpp
-    src/render/Light.cpp
-    src/render/Terrain.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/render/Renderer.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/render/Mesh.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/render/Material.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/render/Shader.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/render/Framebuffer.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/render/Light.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/render/Terrain.cpp
 )
 
 # Physics subsystem
 set(PHYSICS_HEADERS
-    include/kevla/physics/PhysicsWorld.h
-    include/kevla/physics/RigidBody.h
-    include/kevla/physics/Collider.h
-    include/kevla/physics/Joint.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/physics/PhysicsWorld.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/physics/RigidBody.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/physics/Collider.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/physics/Joint.h
 )
 
 set(PHYSICS_SOURCES
-    src/physics/PhysicsWorld.cpp
-    src/physics/RigidBody.cpp
-    src/physics/Collider.cpp
-    src/physics/Joint.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/physics/PhysicsWorld.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/physics/RigidBody.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/physics/Collider.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/physics/Joint.cpp
 )
 
 # AI subsystem
 set(AI_SOURCES
-    src/ai/BehaviorTree.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ai/BehaviorTree.cpp
 )
 
 # VFX subsystem
 set(VFX_SOURCES
-    src/vfx/VFXGraph.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/vfx/VFXGraph.cpp
 )
 
 set(EDITOR_HEADERS
-    include/kevla/editor/Editor.h
-    include/kevla/editor/EditorPanels.h
-    include/kevla/editor/Gizmo.h
-    include/kevla/editor/UndoRedo.h
-    include/kevla/editor/Hotkeys.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/editor/Editor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/editor/EditorPanels.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/editor/Gizmo.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/editor/UndoRedo.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/editor/Hotkeys.h
 )
 
 set(EDITOR_SOURCES
-    src/editor/Editor.cpp
-    src/editor/EditorPanels.cpp
-    src/editor/Gizmo.cpp
-    src/editor/UndoRedo.cpp
-    src/editor/Hotkeys.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/editor/Editor.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/editor/EditorPanels.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/editor/Gizmo.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/editor/UndoRedo.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/editor/Hotkeys.cpp
 )
 
 # Create engine library
