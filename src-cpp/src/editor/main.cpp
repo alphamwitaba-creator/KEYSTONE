@@ -7,7 +7,23 @@
 
 #include <iostream>
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 using namespace kevla;
+
+// ============================================================
+// Load Window Icon (Windows only)
+// ============================================================
+void loadWindowIcon(GLFWwindow* window) {
+#ifdef _WIN32
+    HICON icon = static_cast<HICON>(LoadImageA(NULL, "assets/kevla-icon.ico", IMAGE_ICON, 0, 0, LR_LOADFROMFILE | LR_DEFAULTSIZE));
+    if (icon) {
+        SetClassLongPtrA(GetForegroundWindow(), GCLP_HICON, reinterpret_cast<LONG_PTR>(icon));
+    }
+#endif
+}
 
 // ============================================================
 // Main Entry Point
@@ -33,6 +49,9 @@ int main() {
         glfwTerminate();
         return 1;
     }
+    
+    // Load custom icon
+    loadWindowIcon(window);
     
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
