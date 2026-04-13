@@ -248,9 +248,19 @@ if(WIN32)
     target_compile_definitions(kevla_editor PRIVATE _CRT_SECURE_NO_WARNINGS)
     target_compile_definitions(kevla_core PRIVATE _CRT_SECURE_NO_WARNINGS)
     
+    # Use static runtime (no need for Visual C++ Redistributable)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    
     # Enable console for debugging
     set_target_properties(kevla_editor PROPERTIES
         LINK_FLAGS "/SUBSYSTEM:CONSOLE"
+    )
+    
+    # Collect all DLLs for release
+    add_custom_command(TARGET kevla_editor POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        $<TARGET_FILE_DIR:kevla_editor>/../glfw/src/Debug/glfw3.dll
+        $<TARGET_FILE_DIR:kevla_editor>/
     )
 endif()
 
