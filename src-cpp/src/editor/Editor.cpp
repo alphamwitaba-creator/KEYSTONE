@@ -1,8 +1,5 @@
 #include "kevla/editor/Editor.h"
-#include "kevla/editor/SceneView.h"
-#include "kevla/editor/HierarchyPanel.h"
-#include "kevla/editor/InspectorPanel.h"
-#include "kevla/editor/ToolbarPanel.h"
+#include "kevla/editor/EditorPanels.h"
 #include "kevla/Core.h"
 #include <imgui.h>
 
