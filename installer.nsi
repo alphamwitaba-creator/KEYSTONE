@@ -10,8 +10,7 @@ RequestExecutionLevel admin
 
 ; Interface Settings
 !define MUI_ABORTWARNING
-!define MUI_ICON "..\..\assets\kevla-icon.ico"
-!define MUI_UNICON "..\..\assets\kevla-icon.ico"
+!define MUI_UNABORTWARNING
 
 ; Pages
 !insertmacro MUI_PAGE_WELCOME
@@ -39,11 +38,11 @@ Section "Install"
     
     ; Create Start Menu shortcuts
     CreateDirectory "$SMPROGRAMS\KEVLA Engine"
-    CreateShortCut "$SMPROGRAMS\KEVLA Engine\KEVLA Engine.lnk" "$INSTDIR\kevla_editor.exe" "" "$INSTDIR\kevla_icon.ico"
+    CreateShortCut "$SMPROGRAMS\KEVLA Engine\KEVLA Engine.lnk" "$INSTDIR\kevla_editor.exe" "" "$INSTDIR\kevla_editor.exe"
     CreateShortCut "$SMPROGRAMS\KEVLA Engine\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
     
     ; Create Desktop shortcut
-    CreateShortCut "$DESKTOP\KEVLA Engine.lnk" "$INSTDIR\kevla_editor.exe" "" "$INSTDIR\kevla_icon.ico"
+    CreateShortCut "$DESKTOP\KEVLA Engine.lnk" "$INSTDIR\kevla_editor.exe" "" "$INSTDIR\kevla_editor.exe"
     
     ; Write registry keys
     WriteRegStr HKLM "Software\KEVLA Engine" "InstallDir" "$INSTDIR"
