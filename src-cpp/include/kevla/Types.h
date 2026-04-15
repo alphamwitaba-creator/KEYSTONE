@@ -72,15 +72,15 @@ template<typename T>
 using Scope = std::unique_ptr<T>;
 
 // Function result
-struct Status {
+struct ResultStatus {
     bool success;
     std::string message;
     
-    Status() : success(false) {}
-    Status(bool s, const std::string& msg = "") : success(s), message(msg) {}
+    ResultStatus() : success(false) {}
+    ResultStatus(bool s, const std::string& msg = "") : success(s), message(msg) {}
     
-    static Status OK() { return Status(true); }
-    static Status Error(const std::string& msg) { return Status(false, msg); }
+    static ResultStatus OK() { return ResultStatus(true); }
+    static ResultStatus Error(const std::string& msg) { return ResultStatus(false, msg); }
 };
 
 } // namespace kevla
