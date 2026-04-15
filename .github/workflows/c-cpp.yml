@@ -15,12 +15,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Install CMake
-      uses: actions/download-artifact@v4
-      with:
-        name: cmake
-        path: C:\Program Files\CMake\bin
-        
+    - name: Setup CMake
+      uses: lukka/get-cmake@latest
+      
     - name: Configure
       working-directory: src-cpp
       run: cmake -S . -B build -G "Visual Studio 17 2022" -A x64
