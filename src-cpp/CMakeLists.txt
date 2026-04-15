@@ -27,6 +27,36 @@ FetchContent_MakeAvailable(spdlog)
 
 add_executable(kevla_editor 
     src/editor/main.cpp
+    src/core/Core.cpp
+    src/core/Entity.cpp
+    src/core/Logger.cpp
+    src/core/Scene.cpp
+    src/core/Types.cpp
+    src/editor/Editor.cpp
+    src/editor/EditorPanels.cpp
+    src/editor/Gizmo.cpp
+    src/editor/Hotkeys.cpp
+    src/editor/MaterialEditor.cpp
+    src/editor/SculptPanel.cpp
+    src/editor/UVEditor.cpp
+    src/editor/UndoRedo.cpp
+    src/render/Framebuffer.cpp
+    src/render/Light.cpp
+    src/render/Material.cpp
+    src/render/Mesh.cpp
+    src/render/Renderer.cpp
+    src/render/Shader.cpp
+    src/render/Terrain.cpp
+    src/physics/Collider.cpp
+    src/physics/Joint.cpp
+    src/physics/PhysicsWorld.cpp
+    src/physics/RigidBody.cpp
+    src/ai/BehaviorTree.cpp
+    src/animation/Animation.cpp
+    src/assets/AssetManager.cpp
+    src/serialization/SceneSerialization.cpp
+    src/vfx/VFXGraph.cpp
+    src/sculpt/Sculpt.cpp
 )
 
 target_include_directories(kevla_editor PRIVATE
