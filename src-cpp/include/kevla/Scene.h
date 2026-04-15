@@ -2,6 +2,7 @@
 
 #include "Types.h"
 #include "Vector.h"
+#include "Entity.h"
 
 namespace kevla {
 

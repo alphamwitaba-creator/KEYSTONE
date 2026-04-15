@@ -65,15 +65,11 @@ set(ENGINE_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/Scene.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/Logger.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/render/Renderer.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/render/Terrain.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/ai/BehaviorTree.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/vfx/VFXGraph.h
 )
 
 set(ENGINE_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/Core.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/Logger.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/Types.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/Entity.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/Scene.cpp
 )
@@ -94,33 +90,32 @@ set(RENDERER_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/render/Shader.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/render/Framebuffer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/render/Light.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/render/Terrain.cpp
 )
 
-# Physics subsystem
-set(PHYSICS_HEADERS
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/physics/PhysicsWorld.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/physics/RigidBody.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/physics/Collider.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/physics/Joint.h
-)
-
-set(PHYSICS_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/physics/PhysicsWorld.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/physics/RigidBody.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/physics/Collider.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/physics/Joint.cpp
-)
+# Physics subsystem (commented out for now)
+# set(PHYSICS_HEADERS
+#     ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/physics/PhysicsWorld.h
+#     ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/physics/RigidBody.h
+#     ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/physics/Collider.h
+#     ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/physics/Joint.h
+# )
+# 
+# set(PHYSICS_SOURCES
+#     ${CMAKE_CURRENT_SOURCE_DIR}/src/physics/PhysicsWorld.cpp
+#     ${CMAKE_CURRENT_SOURCE_DIR}/src/physics/RigidBody.cpp
+#     ${CMAKE_CURRENT_SOURCE_DIR}/src/physics/Collider.cpp
+#     ${CMAKE_CURRENT_SOURCE_DIR}/src/physics/Joint.cpp
+# )
 
 # AI subsystem
-set(AI_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ai/BehaviorTree.cpp
-)
+# set(AI_SOURCES
+#     ${CMAKE_CURRENT_SOURCE_DIR}/src/ai/BehaviorTree.cpp
+# )
 
 # VFX subsystem
-set(VFX_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/vfx/VFXGraph.cpp
-)
+# set(VFX_SOURCES
+#     ${CMAKE_CURRENT_SOURCE_DIR}/src/vfx/VFXGraph.cpp
+# )
 
 # Sculpt subsystem
 set(SCULPT_HEADERS
@@ -132,31 +127,31 @@ set(SCULPT_SOURCES
 )
 
 # Assets subsystem
-set(ASSETS_HEADERS
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/assets/AssetManager.h
-)
-
-set(ASSETS_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/assets/AssetManager.cpp
-)
+# set(ASSETS_HEADERS
+#     ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/assets/AssetManager.h
+# )
+# 
+# set(ASSETS_SOURCES
+#     ${CMAKE_CURRENT_SOURCE_DIR}/src/assets/AssetManager.cpp
+# )
 
 # Animation subsystem
-set(ANIMATION_HEADERS
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/animation/Animation.h
-)
-
-set(ANIMATION_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/animation/Animation.cpp
-)
+# set(ANIMATION_HEADERS
+#     ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/animation/Animation.h
+# )
+# 
+# set(ANIMATION_SOURCES
+#     ${CMAKE_CURRENT_SOURCE_DIR}/src/animation/Animation.cpp
+# )
 
 # Serialization subsystem
-set(SERIALIZATION_HEADERS
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/serialization/SceneSerialization.h
-)
-
-set(SERIALIZATION_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/serialization/SceneSerialization.cpp
-)
+# set(SERIALIZATION_HEADERS
+#     ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/serialization/SceneSerialization.h
+# )
+# 
+# set(SERIALIZATION_SOURCES
+#     ${CMAKE_CURRENT_SOURCE_DIR}/src/serialization/SceneSerialization.cpp
+# )
 
 set(EDITOR_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/kevla/editor/Editor.h
@@ -186,18 +181,8 @@ add_library(kevla_core STATIC
     ${ENGINE_SOURCES}
     ${RENDERER_HEADERS}
     ${RENDERER_SOURCES}
-    ${PHYSICS_HEADERS}
-    ${PHYSICS_SOURCES}
-    ${AI_SOURCES}
-    ${VFX_SOURCES}
     ${SCULPT_HEADERS}
     ${SCULPT_SOURCES}
-    ${ASSETS_HEADERS}
-    ${ASSETS_SOURCES}
-    ${ANIMATION_HEADERS}
-    ${ANIMATION_SOURCES}
-    ${SERIALIZATION_HEADERS}
-    ${SERIALIZATION_SOURCES}
 )
 
 target_include_directories(kevla_core PUBLIC

@@ -5,7 +5,6 @@
 #include <map>
 #include <functional>
 #include <memory>
-#include "kevla/Types.h"
 #include "kevla/Entity.h"
 
 namespace kevla {
