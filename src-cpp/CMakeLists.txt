@@ -231,7 +231,6 @@ target_link_libraries(kevla_editor PRIVATE
     kevla_core
     glfw
     OpenGL::GL
-    Vulkan::Vulkan
     imgui
     spdlog::spdlog
 )
